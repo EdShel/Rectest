@@ -30,6 +30,8 @@
   padding-top: 10px;
   padding-bottom: 10px;
   cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
 }
 
 .rightContent {

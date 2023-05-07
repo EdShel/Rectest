@@ -2,12 +2,13 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import db from "@/utils/db";
-import crypto from "crypto";
+import sha256 from "@/utils/sha256";
 
 const handler = NextAuth({
   adapter: PrismaAdapter(db),
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
   providers: [
     CredentialsProvider({
@@ -21,7 +22,7 @@ const handler = NextAuth({
           return null;
         }
 
-        const passwordHash = crypto.createHash("sha256").update(credentials.password).digest("hex");
+        const passwordHash = sha256(credentials.password);
         const user = await db.user.findFirst({
           where: {
             email: credentials.username,
