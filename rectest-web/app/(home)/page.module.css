@@ -1,0 +1,120 @@
+.main {
+}
+
+.banner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+}
+
+.title {
+  font-size: 3rem;
+}
+
+.text {
+  font-size: 1.5rem;
+}
+
+.text > strong {
+  color: var(--col-primary);
+}
+
+.tryNow {
+  border: none;
+  background-color: var(--col-primary);
+  border-radius: 4px;
+  color: #000000;
+  font-weight: bold;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+}
+
+.rightContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+}
+
+.cloud {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+
+  position: relative;
+  text-align: center;
+}
+
+.cloud::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: translate(10px, 20px);
+
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.cloud1 {
+  background-color: #a6d5c1;
+  align-self: flex-start;
+}
+
+.cloud1::before {
+  background-color: #a6d5c188;
+}
+
+.cloud2 {
+  background-color: #b2def8;
+  align-self: flex-end;
+}
+
+.cloud2::before {
+  background-color: #b2def888;
+}
+
+.cloud3 {
+  background-color: #ffe9e4;
+}
+
+.cloud3::before {
+  background-color: #ffe9e488;
+}
+
+.seed {
+  width: 16px;
+  height: 16px;
+  background-color: var(--col-primary);
+  position: absolute;
+  z-index: -2;
+}
+
+.seed1 {
+  right: 10%;
+  top: 20%;
+  transform: rotate(-80deg);
+}
+
+.seed2 {
+  border-top-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+
+.seed3 {
+  left: 10%;
+  bottom: 30%;
+  transform: rotate(30deg);
+  border-radius: 50%;
+}
