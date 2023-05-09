@@ -1,0 +1,61 @@
+.container {
+    width: 100%;
+}
+.container.scrolled {
+    box-shadow: 0 1px 12px var(--col-primary);
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  width: 100px;
+  height: 84px;
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
+}
+
+.signOutButton {
+  border-width: 3px;
+  border-color: var(--col-primary);
+  border-style: solid;
+  border-radius: 8px;
+  background-color: white;
+  font-weight: bold;
+  padding: 5px 10px 5px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.signOutButton:hover,
+.signOutButton:focus {
+  background-color: var(--col-primary);
+}
+
+.linkButton {
+  display: inline-block;
+  border-width: 3px;
+  border-color: var(--col-primary);
+  border-style: solid;
+  border-radius: 8px;
+  background-color: white;
+  font-weight: bold;
+  padding: 5px 10px 5px 10px;
+  cursor: pointer;
+  text-decoration: none;
+  color: black;
+  font-size: 1rem;
+}
+
+.linkButton.primary,
+.linkButton:hover,
+.linkButton:focus {
+  background-color: var(--col-primary);
+}
