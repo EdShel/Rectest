@@ -1,0 +1,43 @@
+.alert {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: var(--col-primary);
+    padding-top: 5px;
+    padding-right: 40px;
+    padding-left: 16px;
+    padding-bottom: 5px;
+    border-radius: 6px;
+    z-index: var(--z-alert);
+    white-space: pre-line;
+  }
+  
+  .error {
+    background-color: #dc5858;
+  }
+  
+  .loading {
+    position: absolute;  
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  .close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  
+  .close img {
+  }
+  
+  .close:hover img {
+    transform: scale(1.5);
+  }
+  

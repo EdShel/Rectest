@@ -1,5 +1,11 @@
 :root {
-    --col-primary: #FFBE3C;
+  --col-primary: #ffbe3c;
+  --col-secondary: #007171;
+
+  --z-alert: 100;
+  --z-modal: 99;
+  --z-context: 98;
+  --z-tooltip: 97;
 }
 
 .container {
