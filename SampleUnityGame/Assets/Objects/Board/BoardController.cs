@@ -10,11 +10,14 @@ public class BoardController : MonoBehaviour
 
     public Material ActivatedCardMaterial;
     public Material DeactivatedCardMaterial;
+    public GameObject VictoryText;
 
     private GameObject[,] cards;
     private GameObject cursor;
 
     private Vector2Int cursorPosition;
+
+    private Coroutine gameOverCoroutine;
 
     void Start()
     {
@@ -60,6 +63,7 @@ public class BoardController : MonoBehaviour
             }
         }
         SetCursorPosition(AREA_WIDTH / 2, AREA_HEIGHT / 2);
+        this.VictoryText.SetActive(false);
     }
 
     void SetCursorPosition(int x, int y)
@@ -80,6 +84,16 @@ public class BoardController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             ResetGameField();
+            if (this.gameOverCoroutine != null)
+            {
+                StopCoroutine(this.gameOverCoroutine);
+                this.gameOverCoroutine = null;
+            }
+        }
+
+        if (this.gameOverCoroutine != null)
+        {
+            return;
         }
 
         int moveX = 0;
@@ -112,6 +126,36 @@ public class BoardController : MonoBehaviour
             meshRenderer.material = meshRenderer.material.color == this.ActivatedCardMaterial.color
                 ? this.DeactivatedCardMaterial 
                 : this.ActivatedCardMaterial;
+
+            if (IsBoardComplete())
+            {
+                this.gameOverCoroutine = StartCoroutine(CorGameOver());
+            }
         }
+    }
+
+    private bool IsBoardComplete()
+    {
+        for(int x = 0; x < AREA_WIDTH; x++)
+        {
+            for(int y = 0; y < AREA_HEIGHT; y++)
+            {
+                GameObject selectedCard = this.cards[x, y];
+                MeshRenderer meshRenderer = selectedCard.GetComponent<MeshRenderer>();
+                if (meshRenderer.material.color != this.ActivatedCardMaterial.color)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private IEnumerator CorGameOver()
+    {
+        this.VictoryText.SetActive(true);
+        yield return new WaitForSeconds(2.5f);
+        ResetGameField();
+        this.gameOverCoroutine = null;
     }
 }
