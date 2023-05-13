@@ -1,7 +1,10 @@
+using Assets.Rectest;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
+using Input = Assets.Rectest.RInput;
 
 public class BoardController : MonoBehaviour
 {
@@ -47,11 +50,19 @@ public class BoardController : MonoBehaviour
         this.cursor = this.transform.GetChild(this.transform.childCount - 1).gameObject;
 
         ResetGameField();
+
+        //RInput.CreateNewTest();
+        RInput.ReplayTest(@"C:\Users\Admin\Documents\Trash\Inv\Proj\SampleUnityGame\Assets\Tests\20230513114507.rectest");
+    }
+
+    private void OnDestroy()
+    {
+        //RInput.StopAndSaveTest(Path.Combine(Application.dataPath, "Tests"));
     }
 
     void ResetGameField()
     {
-        var rng = new System.Random();
+        var rng = new System.Random(0);
         for (int y = 0; y < AREA_HEIGHT; y++)
         {
             for (int x = 0; x < AREA_WIDTH; x++)
