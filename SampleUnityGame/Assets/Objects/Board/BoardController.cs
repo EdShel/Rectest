@@ -1,8 +1,11 @@
 using Assets.Rectest;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using UnityEngine;
 using Input = Assets.Rectest.RInput;
 
@@ -21,6 +24,8 @@ public class BoardController : MonoBehaviour
     private Vector2Int cursorPosition;
 
     private Coroutine gameOverCoroutine;
+
+    private TcpClient client;
 
     void Start()
     {
@@ -52,7 +57,32 @@ public class BoardController : MonoBehaviour
         ResetGameField();
 
         //RInput.CreateNewTest();
-        RInput.ReplayTest(@"C:\Users\Admin\Documents\Trash\Inv\Proj\SampleUnityGame\Assets\Tests\20230513114507.rectest");
+        string rectestRunnerIp = Environment.GetEnvironmentVariable("RECTEST_RUNNER_IP");
+        string rectestReplayTest = Environment.GetEnvironmentVariable("RECTEST_REPLAY_TEST");
+        this.client = new TcpClient(rectestRunnerIp.Split(':')[0], int.Parse(rectestRunnerIp.Split(':')[1]));
+        var stream = this.client.GetStream();
+        var writer = new StreamWriter(stream);
+        var reader = new StreamReader(stream);
+
+        Console.Beep();
+        writer.WriteLine("READY");
+        writer.Flush();
+        string go = reader.ReadLine();
+        if (go == "GO")
+        {
+            RInput.ReplayTest(rectestReplayTest);
+        }
+        StartCoroutine(CorStopTest());
+    }
+
+    IEnumerator CorStopTest()
+    {
+        yield return new WaitForSeconds(10);
+
+        var stream = this.client.GetStream();
+        var writer = new StreamWriter(stream);
+        writer.WriteLine("DONE");
+        writer.Flush();
     }
 
     private void OnDestroy()
@@ -135,7 +165,7 @@ public class BoardController : MonoBehaviour
             GameObject selectedCard = this.cards[this.cursorPosition.x, this.cursorPosition.y];
             MeshRenderer meshRenderer = selectedCard.GetComponent<MeshRenderer>();
             meshRenderer.material = meshRenderer.material.color == this.ActivatedCardMaterial.color
-                ? this.DeactivatedCardMaterial 
+                ? this.DeactivatedCardMaterial
                 : this.ActivatedCardMaterial;
 
             if (IsBoardComplete())
@@ -147,9 +177,9 @@ public class BoardController : MonoBehaviour
 
     private bool IsBoardComplete()
     {
-        for(int x = 0; x < AREA_WIDTH; x++)
+        for (int x = 0; x < AREA_WIDTH; x++)
         {
-            for(int y = 0; y < AREA_HEIGHT; y++)
+            for (int y = 0; y < AREA_HEIGHT; y++)
             {
                 GameObject selectedCard = this.cards[x, y];
                 MeshRenderer meshRenderer = selectedCard.GetComponent<MeshRenderer>();
