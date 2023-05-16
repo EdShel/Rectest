@@ -52,9 +52,8 @@ foreach (string test in testsFiles)
         using var netStream = tcpClient.GetStream();
         using var netReader = new StreamReader(netStream);
         using var netWriter = new StreamWriter(netStream) { AutoFlush = true };
-Console.WriteLine("Before ready");
+
         string? ready = netReader.ReadLine();
-Console.WriteLine("Ready? " + ready);
         if (ready != "READY")
         {
             throw new InvalidOperationException("Client socket miscommunication: " + ready);

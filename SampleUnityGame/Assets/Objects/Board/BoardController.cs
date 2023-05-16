@@ -56,34 +56,10 @@ public class BoardController : MonoBehaviour
 
         ResetGameField();
 
+        RInput.Init(this);
         //RInput.CreateNewTest();
-        string rectestRunnerIp = Environment.GetEnvironmentVariable("RECTEST_RUNNER_IP");
-        string rectestReplayTest = Environment.GetEnvironmentVariable("RECTEST_REPLAY_TEST");
-        this.client = new TcpClient(rectestRunnerIp.Split(':')[0], int.Parse(rectestRunnerIp.Split(':')[1]));
-        var stream = this.client.GetStream();
-        var writer = new StreamWriter(stream);
-        var reader = new StreamReader(stream);
-
-        Console.Beep();
-        writer.WriteLine("READY");
-        writer.Flush();
-        string go = reader.ReadLine();
-        if (go == "GO")
-        {
-            RInput.ReplayTest(rectestReplayTest);
-        }
-        StartCoroutine(CorStopTest());
     }
 
-    IEnumerator CorStopTest()
-    {
-        yield return new WaitForSeconds(10);
-
-        var stream = this.client.GetStream();
-        var writer = new StreamWriter(stream);
-        writer.WriteLine("DONE");
-        writer.Flush();
-    }
 
     private void OnDestroy()
     {

@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
+using System.Net.Sockets;
 using UnityEngine;
 
 namespace Assets.Rectest
@@ -14,51 +13,100 @@ namespace Assets.Rectest
         private static TestRecording recordingTest;
         private static TestReplay replayTest;
 
-        public static void CreateNewTest()
+        private static TcpClient client;
+
+        public static void Init(MonoBehaviour context)
         {
-            if (recordingTest != null || replayTest != null)
+            string rectestRecordTest = Environment.GetEnvironmentVariable("RECTEST_RECORD_TEST");
+
+            if (!string.IsNullOrEmpty(rectestRecordTest))
             {
-                throw new InvalidOperationException("Test is already in progress.");
+                CreateNewTest(rectestRecordTest);
+                return;
             }
 
-            recordingTest = new TestRecording();
-            recordingTest.StartTime = DateTime.UtcNow;
-            recordingTest.Writer = new StreamWriter(new MemoryStream()) { NewLine = "\n" };
-        }
+            string rectestRunnerIp = Environment.GetEnvironmentVariable("RECTEST_RUNNER_IP");
+            string rectestReplayTest = Environment.GetEnvironmentVariable("RECTEST_REPLAY_TEST");
 
-        public static void ReplayTest(string testFilePath)
-        {
-            if (recordingTest != null || replayTest != null)
+            client = new TcpClient(rectestRunnerIp.Split(':')[0], int.Parse(rectestRunnerIp.Split(':')[1]));
+            var stream = client.GetStream();
+            var writer = new StreamWriter(stream) { AutoFlush = true };
+            var reader = new StreamReader(stream);
+
+            writer.WriteLine("READY");
+            string go = reader.ReadLine();
+            if (go != "GO")
             {
-                throw new InvalidOperationException("Test is already in progress.");
+                throw new InvalidOperationException("Unexpected command");
             }
 
             replayTest = new TestReplay();
-            replayTest.Actions = File.ReadAllLines(testFilePath).Select(line =>
+            string[] fileLines = File.ReadAllLines(rectestReplayTest);
+            long testDuration = long.Parse(fileLines[0]);
+            replayTest.KeysDown = new List<KeyDownData>();
+            replayTest.EventsTriggers = new List<EventTriggerData>();
+            replayTest.ReplayedEventsTriggers = new List<EventTriggerData>();
+            foreach (string line in fileLines.Skip(1))
             {
-                var l = line.Split(" ");
-                return new ReplayAction
+                string[] dataParts = line.Split(" ", 3);
+                long dataTime = long.Parse(dataParts[0]);
+                string dataType = dataParts[1];
+                string dataPayload = dataParts[2];
+
+                switch (dataType)
                 {
-                    Tick = long.Parse(l[0]),
-                    Key = Enum.Parse<KeyCode>(l[2])
-                };
-            }).ToArray();
-            replayTest.ActionPointer = 0;
+                    case DataType.KeyDown:
+                        replayTest.KeysDown.Add(new KeyDownData { Tick = dataTime, Key = Enum.Parse<KeyCode>(dataPayload) });
+                        break;
+                    case DataType.EventTrigger:
+                        replayTest.EventsTriggers.Add(new EventTriggerData { Tick = dataTime, EventName = dataPayload });
+                        break;
+                }
+            }
+            replayTest.KeysDownPointer = 0;
             replayTest.StartTime = DateTime.UtcNow;
 
+            context.StartCoroutine(CorStopReplayTest(testDuration));
         }
 
-        public static void StopAndSaveTest(string folder)
+        private static IEnumerator CorStopReplayTest(long testDuration)
+        {
+            yield return new WaitForSeconds(TimeSpan.FromTicks(testDuration).Seconds);
+
+            var stream = client.GetStream();
+            var writer = new StreamWriter(stream) { AutoFlush = true };
+            writer.WriteLine("DONE");
+
+            long epsilon = TimeSpan.FromSeconds(0.25d).Ticks;
+
+            foreach(var recordedEvent in replayTest.EventsTriggers)
+            {
+                var matchingEvent = replayTest.ReplayedEventsTriggers.FirstOrDefault(e => e.EventName == recordedEvent.EventName
+                    && Math.Abs(e.Tick - recordedEvent.Tick) <= epsilon);
+                if (matchingEvent == null)
+                {
+                    string time = TimeSpan.FromTicks(recordedEvent.Tick).ToString("HH:mm:ss");
+                    writer.WriteLine($"ERROR: Event <{recordedEvent.EventName}> wasn't triggered at {time}");
+                    yield break;
+                }
+            }
+
+            writer.WriteLine("OK");
+        }
+
+        public static void Cleanup()
         {
             if (recordingTest == null)
             {
-                throw new InvalidOperationException("Test wasn't started.");
+                return;
             }
 
-            string fileName = recordingTest.StartTime.ToString("yyyyMMddHHmmss") + ".rectest";
-            string filePath = Path.Combine(folder, fileName);
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-            using var fs = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write);
+            //string fileName = recordingTest.StartTime.ToString("yyyyMMddHHmmss") + ".rectest";
+            Directory.CreateDirectory(Path.GetDirectoryName(recordingTest.FileName));
+            using var fs = new FileStream(recordingTest.FileName, FileMode.CreateNew, FileAccess.Write);
+            using var sw = new StreamWriter(fs) { AutoFlush = true, NewLine = "\n" };
+            sw.WriteLine((DateTime.UtcNow - recordingTest.StartTime).Ticks);
+
             recordingTest.Writer.Flush();
             recordingTest.Writer.BaseStream.Position = 0;
             recordingTest.Writer.BaseStream.CopyTo(fs);
@@ -66,19 +114,32 @@ namespace Assets.Rectest
             recordingTest = null;
         }
 
+        private static void CreateNewTest(string fileName)
+        {
+            if (recordingTest != null || replayTest != null)
+            {
+                throw new InvalidOperationException("Test is already in progress.");
+            }
+
+            recordingTest = new TestRecording();
+            recordingTest.FileName = fileName;
+            recordingTest.StartTime = DateTime.UtcNow;
+            recordingTest.Writer = new StreamWriter(new MemoryStream()) { NewLine = "\n" };
+        }
+
         public static bool GetKeyDown(KeyCode key)
         {
             if (replayTest != null)
             {
-                int index = Array.FindIndex(replayTest.Actions, replayTest.ActionPointer, a => a.Key == key);
+                int index = replayTest.KeysDown.FindIndex(replayTest.KeysDownPointer, a => a.Key == key);
                 if (index == -1)
                 {
                     return false;
                 }
-                long now = (DateTime.UtcNow - replayTest.StartTime).Ticks;
-                if (replayTest.Actions[index].Tick < now)
+                long now = RTimer.Now();
+                if (replayTest.EventsTriggers[index].Tick < now)
                 {
-                    replayTest.ActionPointer = index + 1;
+                    replayTest.KeysDownPointer = index + 1;
                     return true;
                 }
                 return false;
@@ -87,15 +148,37 @@ namespace Assets.Rectest
             bool isKeyDown = Input.GetKeyDown(key);
             if (recordingTest != null && isKeyDown)
             {
-                DateTime now = DateTime.UtcNow;
-                long ticks = (now - recordingTest.StartTime).Ticks;
-                recordingTest.Writer.WriteLine($"{ticks} DOWN {key}");
+                recordingTest.Writer.WriteLine($"{RTimer.Now()} {DataType.KeyDown} {key}");
             }
             return isKeyDown;
         }
 
+        public static void TriggerEvent(string eventName)
+        {
+            if (recordingTest != null)
+            {
+                recordingTest.Writer.WriteLine($"{RTimer.Now()} {DataType.EventTrigger} {eventName}");
+                return;
+            }
+            if (replayTest != null)
+            {
+                replayTest.ReplayedEventsTriggers.Add(new EventTriggerData { Tick = RTimer.Now(), EventName = eventName });
+            }
+        }
+
+        private static class RTimer
+        {
+            public static long Now()
+            {
+                DateTime now = DateTime.UtcNow;
+                long ticks = (now - (recordingTest?.StartTime ?? replayTest.StartTime)).Ticks;
+                return ticks;
+            }
+        }
+
         private class TestRecording
         {
+            public string FileName;
             public DateTime StartTime;
             public StreamWriter Writer;
         }
@@ -103,14 +186,28 @@ namespace Assets.Rectest
         private class TestReplay
         {
             public DateTime StartTime;
-            public ReplayAction[] Actions;
-            public int ActionPointer;
+            public List<KeyDownData> KeysDown;
+            public List<EventTriggerData> EventsTriggers;
+            public List<EventTriggerData> ReplayedEventsTriggers;
+            public int KeysDownPointer;
         }
 
-        private class ReplayAction
+        private class KeyDownData
         {
             public long Tick;
             public KeyCode Key;
+        }
+
+        private class EventTriggerData
+        {
+            public long Tick;
+            public string EventName;
+        }
+
+        private static class DataType
+        {
+            public const string KeyDown = "DOWN";
+            public const string EventTrigger = "EVENT";
         }
     }
 }
