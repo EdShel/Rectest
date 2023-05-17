@@ -1,13 +1,9 @@
 using Assets.Rectest;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
-using Input = Assets.Rectest.RInput;
 
 public class BoardController : MonoBehaviour
 {
@@ -57,14 +53,8 @@ public class BoardController : MonoBehaviour
         ResetGameField();
 
         RInput.Init(this);
-        //RInput.CreateNewTest();
     }
 
-
-    private void OnDestroy()
-    {
-        //RInput.StopAndSaveTest(Path.Combine(Application.dataPath, "Tests"));
-    }
 
     void ResetGameField()
     {
@@ -98,7 +88,13 @@ public class BoardController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+            return;
+        }
+
+        if (RInput.GetKeyDown(KeyCode.R))
         {
             ResetGameField();
             if (this.gameOverCoroutine != null)
@@ -115,19 +111,19 @@ public class BoardController : MonoBehaviour
 
         int moveX = 0;
         int moveY = 0;
-        if (Input.GetKeyDown(KeyCode.D))
+        if (RInput.GetKeyDown(KeyCode.D))
         {
             moveX = 1;
         }
-        if (Input.GetKeyDown(KeyCode.A))
+        if (RInput.GetKeyDown(KeyCode.A))
         {
             moveX = -1;
         }
-        if (Input.GetKeyDown(KeyCode.W))
+        if (RInput.GetKeyDown(KeyCode.W))
         {
             moveY = 1;
         }
-        if (Input.GetKeyDown(KeyCode.S))
+        if (RInput.GetKeyDown(KeyCode.S))
         {
             moveY = -1;
         }
@@ -146,6 +142,7 @@ public class BoardController : MonoBehaviour
 
             if (IsBoardComplete())
             {
+                RInput.TriggerEvent("victory");
                 this.gameOverCoroutine = StartCoroutine(CorGameOver());
             }
         }
@@ -174,5 +171,10 @@ public class BoardController : MonoBehaviour
         yield return new WaitForSeconds(2.5f);
         ResetGameField();
         this.gameOverCoroutine = null;
+    }
+
+    private void OnDestroy()
+    {
+        RInput.Cleanup();
     }
 }

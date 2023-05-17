@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -28,7 +29,14 @@ namespace Assets.Rectest
             string rectestRunnerIp = Environment.GetEnvironmentVariable("RECTEST_RUNNER_IP");
             string rectestReplayTest = Environment.GetEnvironmentVariable("RECTEST_REPLAY_TEST");
 
-            client = new TcpClient(rectestRunnerIp.Split(':')[0], int.Parse(rectestRunnerIp.Split(':')[1]));
+            if (string.IsNullOrEmpty(rectestRunnerIp) || string.IsNullOrEmpty(rectestReplayTest))
+            {
+                return;
+            }
+
+            string[] ipPort = rectestRunnerIp.Split(':');
+
+            client = new TcpClient(ipPort[0], int.Parse(ipPort[1]));
             var stream = client.GetStream();
             var writer = new StreamWriter(stream) { AutoFlush = true };
             var reader = new StreamReader(stream);
@@ -79,19 +87,22 @@ namespace Assets.Rectest
 
             long epsilon = TimeSpan.FromSeconds(0.25d).Ticks;
 
-            foreach(var recordedEvent in replayTest.EventsTriggers)
+            foreach (var recordedEvent in replayTest.EventsTriggers)
             {
-                var matchingEvent = replayTest.ReplayedEventsTriggers.FirstOrDefault(e => e.EventName == recordedEvent.EventName
-                    && Math.Abs(e.Tick - recordedEvent.Tick) <= epsilon);
+                var matchingEvent = replayTest.ReplayedEventsTriggers.FirstOrDefault(
+                    e => e.EventName == recordedEvent.EventName
+                        && Math.Abs(e.Tick - recordedEvent.Tick) <= epsilon);
                 if (matchingEvent == null)
                 {
-                    string time = TimeSpan.FromTicks(recordedEvent.Tick).ToString("HH:mm:ss");
+                    string time = TimeSpan.FromTicks(recordedEvent.Tick).ToString(@"hh\:mm\:ss");
                     writer.WriteLine($"ERROR: Event <{recordedEvent.EventName}> wasn't triggered at {time}");
+                    Application.Quit();
                     yield break;
                 }
             }
 
             writer.WriteLine("OK");
+            Application.Quit();
         }
 
         public static void Cleanup()
@@ -101,11 +112,11 @@ namespace Assets.Rectest
                 return;
             }
 
-            //string fileName = recordingTest.StartTime.ToString("yyyyMMddHHmmss") + ".rectest";
             Directory.CreateDirectory(Path.GetDirectoryName(recordingTest.FileName));
+            File.Delete(recordingTest.FileName);
             using var fs = new FileStream(recordingTest.FileName, FileMode.CreateNew, FileAccess.Write);
             using var sw = new StreamWriter(fs) { AutoFlush = true, NewLine = "\n" };
-            sw.WriteLine((DateTime.UtcNow - recordingTest.StartTime).Ticks);
+            sw.WriteLine(RTimer.Now());
 
             recordingTest.Writer.Flush();
             recordingTest.Writer.BaseStream.Position = 0;
@@ -137,7 +148,8 @@ namespace Assets.Rectest
                     return false;
                 }
                 long now = RTimer.Now();
-                if (replayTest.EventsTriggers[index].Tick < now)
+
+                if (replayTest.KeysDown[index].Tick < now)
                 {
                     replayTest.KeysDownPointer = index + 1;
                     return true;

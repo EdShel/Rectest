@@ -13,8 +13,36 @@ if (cli == null)
 
 string gameExe = Path.GetFullPath(cli.ExecutablePath);
 string gameWd = Path.GetDirectoryName(gameExe) ?? throw new InvalidOperationException("Invalid executable path: " + gameExe);
-
 string testsFolder = Path.GetFullPath(cli.TestsPath);
+
+if (cli.Record)
+{
+    string testFileName = string.IsNullOrEmpty(cli.TestName)
+        ? DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".rectest"
+        : cli.TestName + ".rectest";
+    string testFile = Path.Combine(testsFolder, testFileName);
+    var gameProcess = Process.Start(new ProcessStartInfo
+    {
+        FileName = gameExe,
+        WorkingDirectory = gameWd,
+        Environment =
+            {
+                { "RECTEST_RECORD_TEST", testFile },
+            }
+    }) ?? throw new InvalidOperationException("Couldn't start game process.");
+
+    gameProcess.WaitForExit();
+
+    if (File.Exists(testFile))
+    {
+        Console.WriteLine("New test was saved to the following file:");
+        Console.WriteLine(testFile);
+    } else {
+        Console.WriteLine("Test wasn't recorded.");
+    }
+    return;
+}
+
 string[] testsFiles = Directory.GetFiles(testsFolder, "*.rectest");
 
 if (testsFiles.Length == 0)
@@ -24,7 +52,6 @@ if (testsFiles.Length == 0)
 
 int successCount = 0;
 int failedCount = 0;
-int totalCount = 0;
 
 string serverAddress = "127.0.0.1:8644";
 var server = new TcpListener(IPEndPoint.Parse(serverAddress));
@@ -32,7 +59,6 @@ server.Start();
 
 foreach (string test in testsFiles)
 {
-    totalCount++;
     Console.WriteLine("Executing " + test);
 
     try
@@ -65,7 +91,7 @@ foreach (string test in testsFiles)
             ArgumentList = { "./lib/ffmpeg.exe", "-f", "gdigrab", "-framerate", "30", "-i", "desktop", "./rec.mp4", "-y" },
             CreateNoWindow = true,
             UseShellExecute = false,
-            RedirectStandardInput = true
+            RedirectStandardInput = true,
         }) ?? throw new InvalidOperationException("Couldn't start ffmpeg process.");
 
         Console.Beep();
@@ -78,27 +104,45 @@ foreach (string test in testsFiles)
             throw new InvalidOperationException("Client socket miscommunication: " + done);
         }
 
-        Console.Beep();
-
         screenRecordingProcess.StandardInput.Write("q");
         screenRecordingProcess.StandardInput.Close();
         screenRecordingProcess.WaitForExit();
+
+        string testResult = netReader.ReadLine() ?? throw new InvalidOperationException("No test result reported.");
+        if (testResult.StartsWith("ERROR")) {
+            failedCount++;
+            Console.WriteLine(testResult);
+        }
+        if (testResult.StartsWith("OK"))
+        {
+            successCount++;
+        }
 
         gameProcess.Kill();
     }
     catch (Exception ex)
     {
+        failedCount++;
         Console.Error.WriteLine("Unhandled exception during test execution.");
         Console.Error.WriteLine(ex.Message);
         Console.Error.WriteLine(ex.StackTrace);
     }
 }
 
+Console.WriteLine(failedCount == 0 ? "ALL TESTS PASSED!" : "ERROR!");
+Console.WriteLine($"Total {failedCount + successCount}, Passed {successCount}, Failed {failedCount}");
+
 server.Stop();
 
 
 class Cli
 {
+    [Option('r', "record", Required = false, HelpText = "Recording mode")]
+    public bool Record { get; set; }
+
+    [Option('n', "name", Required = false, HelpText = "New test mode")]
+    public string? TestName { get; set; }
+
     [Option('t', "tests", Required = true, HelpText = "Folder with tests to run")]
     public string TestsPath { get; set; } = null!;
 
