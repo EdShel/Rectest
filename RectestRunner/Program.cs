@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using CommandLine;
+using Rectest.TestRunner;
 
 var parsing = Parser.Default.ParseArguments<Cli>(args);
 Cli? cli = parsing.Value;
@@ -57,6 +58,8 @@ string serverAddress = "127.0.0.1:8644";
 var server = new TcpListener(IPEndPoint.Parse(serverAddress));
 server.Start();
 
+string testRunId = Guid.NewGuid().ToString();
+
 foreach (string test in testsFiles)
 {
     Console.WriteLine("Executing " + test);
@@ -85,14 +88,10 @@ foreach (string test in testsFiles)
             throw new InvalidOperationException("Client socket miscommunication: " + ready);
         }
 
-        var screenRecordingProcess = Process.Start(new ProcessStartInfo
-        {
-            FileName = "powershell",
-            ArgumentList = { "./lib/ffmpeg.exe", "-f", "gdigrab", "-framerate", "30", "-i", "desktop", "./rec.mp4", "-y" },
-            CreateNoWindow = true,
-            UseShellExecute = false,
-            RedirectStandardInput = true,
-        }) ?? throw new InvalidOperationException("Couldn't start ffmpeg process.");
+        string recordingFileName = Path.GetFileNameWithoutExtension(test) + "." + testRunId + ".mp4";
+        string recordingFile = Path.GetFullPath(recordingFileName);
+
+        using ScreenRecorder screenRecorder = ScreenRecorder.Begin(recordingFile);
 
         Console.Beep();
 
@@ -104,9 +103,7 @@ foreach (string test in testsFiles)
             throw new InvalidOperationException("Client socket miscommunication: " + done);
         }
 
-        screenRecordingProcess.StandardInput.Write("q");
-        screenRecordingProcess.StandardInput.Close();
-        screenRecordingProcess.WaitForExit();
+        screenRecorder.StopRecording();
 
         string testResult = netReader.ReadLine() ?? throw new InvalidOperationException("No test result reported.");
         if (testResult.StartsWith("ERROR")) {
