@@ -10,13 +10,13 @@ namespace Rectest.TestRunner
         {
             apiClient = new HttpClient()
             {
-                BaseAddress = new Uri($"http://localhost:3000/api/project/{apiKey}")
+                BaseAddress = new Uri($"http://localhost:3000/api/project/{apiKey}/")
             };
         }
 
-        public async Task SaveTestResult(TestRunResult result)
+        public async Task SaveTestResultAsync(TestRunResult result)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, "/test")
+            using var request = new HttpRequestMessage(HttpMethod.Post, "test")
             {
                 Content = JsonContent.Create(result)
             };

@@ -30,6 +30,13 @@ const ProjectRepository = {
       },
     });
   },
+  findByApiKey: async (apiKey: string) => {
+    return await db.gameProject.findUnique({
+      where: {
+        apiKey,
+      },
+    });
+  },
 };
 export default ProjectRepository;
 

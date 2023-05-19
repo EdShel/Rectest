@@ -4,6 +4,19 @@ using System.Net.Sockets;
 using CommandLine;
 using Rectest.TestRunner;
 
+using var apiClient = new RectestApiClient("test");
+await apiClient.SaveTestResultAsync(new TestRunResult(
+    Total: 10,
+    Success: 10,
+    Failed: 3,
+    Tests: new []{
+        new TestResult("foo", true, null, Convert.ToBase64String(File.ReadAllBytes(@"C:\Users\Admin\Documents\Trash\Inv\Proj\RectestRunner\20230517173523.d180769d-bb52-479e-8e91-0cce6d5ccd69.mp4"))),
+        new TestResult("bar", false, "Error", Convert.ToBase64String(File.ReadAllBytes(@"C:\Users\Admin\Documents\Trash\Inv\Proj\RectestRunner\20230517173549.d180769d-bb52-479e-8e91-0cce6d5ccd69.mp4")))
+    }
+));
+
+return;
+
 var parsing = Parser.Default.ParseArguments<Cli>(args);
 Cli? cli = parsing.Value;
 if (cli == null)

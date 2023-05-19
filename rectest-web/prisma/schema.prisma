@@ -66,6 +66,7 @@ model GameProject {
   apiKey             String              @unique
   insertDate         DateTime            @default(now())
   gameProjectMembers GameProjectMember[]
+  testsRuns            TestRun[]
 }
 
 model GameProjectMember {
@@ -76,4 +77,25 @@ model GameProjectMember {
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([gameProjectId, userId])
+}
+
+model TestRun {
+  id            String       @id @default(cuid())
+  total         Int
+  success       Int
+  failed        Int
+  gameProjectId String
+  insertDate    DateTime     @default(now())
+  gameProject   GameProject  @relation(fields: [gameProjectId], references: [id], onDelete: Cascade)
+  testsResults  TestResult[]
+}
+
+model TestResult {
+  id                  String  @id @default(cuid())
+  testRunId           String
+  testFile            String
+  isSuccess           Boolean
+  errorMessage        String?
+  recordingFileBase64 String
+  testRun             TestRun @relation(fields: [testRunId], references: [id], onDelete: Cascade)
 }
