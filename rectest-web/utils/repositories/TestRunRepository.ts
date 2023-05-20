@@ -29,5 +29,11 @@ const TestRunRepository = {
       },
     });
   },
+  async listTestRuns(gameProjectId: string) {
+    return await db.testRun.findMany({
+      where: { gameProjectId },
+      orderBy: { insertDate: "desc" },
+    });
+  },
 };
 export default TestRunRepository;

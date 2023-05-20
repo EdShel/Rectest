@@ -35,7 +35,7 @@ namespace Rectest.TestRunner
         int Total,
         int Success,
         int Failed,
-        IEnumerable<TestResult> Tests
+        IEnumerable<TestResult> TestsResults
     );
 
     public record TestResult(

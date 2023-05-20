@@ -3,7 +3,8 @@
 import React from "react";
 import { GameProject } from "@prisma/client";
 import { useShowAlertNotification } from "@/utils/useShowAlertNotification";
-import styles from './styles.module.css';
+import styles from "./styles.module.css";
+import Link from "next/link";
 
 interface ProjectItemProps {
   project: GameProject;
@@ -24,6 +25,7 @@ export default function ProjectItem({ project }: ProjectItemProps) {
       >
         Copy API key
       </button>
+      <Link href={`/dashboard/project/${project.id}`}>{">"}</Link>
     </div>
   );
 }

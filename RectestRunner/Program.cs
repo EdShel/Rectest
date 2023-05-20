@@ -4,19 +4,6 @@ using System.Net.Sockets;
 using CommandLine;
 using Rectest.TestRunner;
 
-using var apiClient = new RectestApiClient("test");
-await apiClient.SaveTestResultAsync(new TestRunResult(
-    Total: 10,
-    Success: 10,
-    Failed: 3,
-    Tests: new []{
-        new TestResult("foo", true, null, Convert.ToBase64String(File.ReadAllBytes(@"C:\Users\Admin\Documents\Trash\Inv\Proj\RectestRunner\20230517173523.d180769d-bb52-479e-8e91-0cce6d5ccd69.mp4"))),
-        new TestResult("bar", false, "Error", Convert.ToBase64String(File.ReadAllBytes(@"C:\Users\Admin\Documents\Trash\Inv\Proj\RectestRunner\20230517173549.d180769d-bb52-479e-8e91-0cce6d5ccd69.mp4")))
-    }
-));
-
-return;
-
 var parsing = Parser.Default.ParseArguments<Cli>(args);
 Cli? cli = parsing.Value;
 if (cli == null)
@@ -51,7 +38,9 @@ if (cli.Record)
     {
         Console.WriteLine("New test was saved to the following file:");
         Console.WriteLine(testFile);
-    } else {
+    }
+    else
+    {
         Console.WriteLine("Test wasn't recorded.");
     }
     return;
@@ -64,8 +53,7 @@ if (testsFiles.Length == 0)
     throw new InvalidOperationException("No tests are found in folder " + testsFolder);
 }
 
-int successCount = 0;
-int failedCount = 0;
+var testResults = new List<TestResult>();
 
 string serverAddress = "127.0.0.1:8644";
 var server = new TcpListener(IPEndPoint.Parse(serverAddress));
@@ -119,43 +107,52 @@ foreach (string test in testsFiles)
         screenRecorder.StopRecording();
 
         string testResult = netReader.ReadLine() ?? throw new InvalidOperationException("No test result reported.");
-        if (testResult.StartsWith("ERROR")) {
-            failedCount++;
+        if (testResult.StartsWith("ERROR"))
+        {
+            testResults.Add(new TestResult(
+                TestFile: Path.GetFileNameWithoutExtension(test),
+                IsSuccess: false,
+                ErrorMessage: testResult,
+                RecordingFileBase64: Convert.ToBase64String(File.ReadAllBytes(recordingFile))
+            ));
             Console.WriteLine(testResult);
         }
         if (testResult.StartsWith("OK"))
         {
-            successCount++;
+            testResults.Add(new TestResult(
+                TestFile: Path.GetFileNameWithoutExtension(test),
+                IsSuccess: true,
+                ErrorMessage: null,
+                RecordingFileBase64: Convert.ToBase64String(File.ReadAllBytes(recordingFile))
+            ));
         }
 
         gameProcess.Kill();
     }
     catch (Exception ex)
     {
-        failedCount++;
+        testResults.Add(new TestResult(
+            TestFile: Path.GetFileNameWithoutExtension(test),
+            IsSuccess: false,
+            ErrorMessage: "Unhandled exception during test execution",
+            RecordingFileBase64: string.Empty
+        ));
         Console.Error.WriteLine("Unhandled exception during test execution.");
         Console.Error.WriteLine(ex.Message);
         Console.Error.WriteLine(ex.StackTrace);
     }
 }
 
-Console.WriteLine(failedCount == 0 ? "ALL TESTS PASSED!" : "ERROR!");
-Console.WriteLine($"Total {failedCount + successCount}, Passed {successCount}, Failed {failedCount}");
+using var apiClient = new RectestApiClient(cli.ApiKey);
+var runResult = new TestRunResult(
+    Total: testResults.Count,
+    Success: testResults.Count(t => t.IsSuccess),
+    Failed: testResults.Count(t => !t.IsSuccess),
+    TestsResults: testResults
+);
+await apiClient.SaveTestResultAsync(runResult);
+
+Console.WriteLine(runResult.Failed == 0 ? "ALL TESTS PASSED!" : "ERROR!");
+Console.WriteLine($"Total {runResult.ToString}, Passed {runResult.Success}, Failed {runResult.Failed}");
 
 server.Stop();
-
-
-class Cli
-{
-    [Option('r', "record", Required = false, HelpText = "Recording mode")]
-    public bool Record { get; set; }
-
-    [Option('n', "name", Required = false, HelpText = "New test mode")]
-    public string? TestName { get; set; }
-
-    [Option('t', "tests", Required = true, HelpText = "Folder with tests to run")]
-    public string TestsPath { get; set; } = null!;
-
-    [Option('g', "game-exe", Required = true, HelpText = "Built game executable")]
-    public string ExecutablePath { get; set; } = null!;
-}

@@ -32,9 +32,12 @@ const ProjectRepository = {
   },
   findByApiKey: async (apiKey: string) => {
     return await db.gameProject.findUnique({
-      where: {
-        apiKey,
-      },
+      where: { apiKey },
+    });
+  },
+  findById: async (id: string) => {
+    return await db.gameProject.findUnique({
+      where: { id },
     });
   },
 };
