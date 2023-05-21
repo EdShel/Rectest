@@ -1,6 +1,9 @@
 import ProjectRepository from "@/utils/repositories/ProjectRepository";
 import TestRunRepository from "@/utils/repositories/TestRunRepository";
+import Image from "next/image";
 import { notFound } from "next/navigation";
+import successIcon from "@/public/success-icon.svg";
+import Link from "next/link";
 
 interface PathParams {
   id: string;
@@ -21,12 +24,13 @@ export default async function Project({ params }: { params: PathParams }) {
       <h1>{project.name}</h1>
       <div>
         {tests.map((test) => (
-          <div>
+          <Link href={`/dashboard/project/${params.id}/${test.id}`}>
+            <Image src={successIcon} alt="Success" />
             <p>{test.insertDate.toLocaleString()}</p>
             <p>Total: {test.total}</p>
             <p>Success: {test.success}</p>
             <p>Failed: {test.failed}</p>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

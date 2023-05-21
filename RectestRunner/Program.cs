@@ -115,6 +115,7 @@ foreach (string test in testsFiles)
                 ErrorMessage: testResult,
                 RecordingFileBase64: Convert.ToBase64String(File.ReadAllBytes(recordingFile))
             ));
+            File.Delete(recordingFile);
             Console.WriteLine(testResult);
         }
         if (testResult.StartsWith("OK"))
@@ -125,6 +126,7 @@ foreach (string test in testsFiles)
                 ErrorMessage: null,
                 RecordingFileBase64: Convert.ToBase64String(File.ReadAllBytes(recordingFile))
             ));
+            File.Delete(recordingFile);
         }
 
         gameProcess.Kill();
@@ -153,6 +155,6 @@ var runResult = new TestRunResult(
 await apiClient.SaveTestResultAsync(runResult);
 
 Console.WriteLine(runResult.Failed == 0 ? "ALL TESTS PASSED!" : "ERROR!");
-Console.WriteLine($"Total {runResult.ToString}, Passed {runResult.Success}, Failed {runResult.Failed}");
+Console.WriteLine($"Total {runResult.Total}, Passed {runResult.Success}, Failed {runResult.Failed}");
 
 server.Stop();

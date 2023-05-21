@@ -5,7 +5,7 @@ export interface TestRunCreateEntity {
   total: number;
   success: number;
   failed: number;
-  tests: TestResultCreateEntity[];
+  testsResults: TestResultCreateEntity[];
 }
 
 export interface TestResultCreateEntity {
@@ -23,7 +23,7 @@ const TestRunRepository = {
         gameProjectId,
         testsResults: {
           createMany: {
-            data: testRun.tests,
+            data: testRun.testsResults,
           },
         },
       },
@@ -33,6 +33,12 @@ const TestRunRepository = {
     return await db.testRun.findMany({
       where: { gameProjectId },
       orderBy: { insertDate: "desc" },
+    });
+  },
+  async findTestRun(testRunId: string) {
+    return await db.testRun.findUnique({
+      where: { id: testRunId },
+      include: { testsResults: true },
     });
   },
 };
