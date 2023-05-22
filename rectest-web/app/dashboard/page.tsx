@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProjectItem from "./components/ProjectItem";
-import styles from './styles.module.css';
+import styles from "./styles.module.css";
 
 export default async function Dashboard() {
   const session = await getServerSession();
@@ -17,8 +17,9 @@ export default async function Dashboard() {
 
   return (
     <div>
-      <Link href="/dashboard/project/new">Create new project</Link>
       <div className={clsx("container", styles.list)}>
+        <h1>My projects</h1>
+        <Link href="/dashboard/project/new">Create new project</Link>
         {projects.map((p) => (
           <ProjectItem project={p} />
         ))}

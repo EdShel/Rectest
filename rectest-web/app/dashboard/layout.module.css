@@ -1,0 +1,46 @@
+.container {
+  background-color: #fafafa;
+  display: grid;
+  grid-template-columns: minmax(200px, max-content) 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+  grid-template-rows: max-content 1fr;
+  row-gap: 30px;
+  column-gap: 30px;
+  min-height: 100vh;
+}
+
+.container > nav {
+  grid-area: header;
+  background-color: #ffffff;
+  box-shadow: 0 4px 4px #eeeeee;
+}
+
+.container > aside {
+  grid-area: sidebar;
+  padding-left: 16px;
+}
+
+.link {
+  display: block;
+  text-decoration: none;
+  color: var(--col-text);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.link:hover {
+  background-color: var(--col-primary);
+  border-radius: 4px;
+}
+
+.icon {
+  margin-right: 10px;
+}
+
+.container > main {
+  grid-area: main;
+}

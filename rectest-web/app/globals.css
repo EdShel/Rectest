@@ -1,6 +1,7 @@
 :root {
   --col-primary: #ffbe3c;
   --col-secondary: #007171;
+  --col-text: #333f48;
 
   --z-alert: 100;
   --z-modal: 99;
@@ -32,4 +33,17 @@
 
 body {
   margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+div {
+  color: var(--col-text);
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
 }
