@@ -1,5 +1,30 @@
 .list {
-    display: flex;
-    flex-direction: column;
-    row-gap: 16px;
+}
+
+.newProject {
+    margin-top: 20px;
+    display: block;
+    border-style: dashed;    
+    border-width: 2px;
+    border-color: var(--col-primary);
+    border-radius: 8px;
+    color: var(--col-text);
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.newProject:hover {
+    background-color: var(--col-primary);
+}
+
+.projects {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 20px;
+    column-gap: 16px;
 }

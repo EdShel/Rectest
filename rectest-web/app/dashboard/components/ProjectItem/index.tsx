@@ -15,17 +15,22 @@ export default function ProjectItem({ project }: ProjectItemProps) {
 
   return (
     <div className={styles.container}>
-      <p>Name: {project.name}</p>
-      <p>Api key: ***************</p>
-      <button
-        onClick={() => {
-          navigator.clipboard.writeText(project.apiKey);
-          showInfo("API key successfully copied to clipboard!", { autoClose: true });
-        }}
-      >
-        Copy API key
-      </button>
-      <Link href={`/dashboard/project/${project.id}`}>{">"}</Link>
+      <Link href={`/dashboard/project/${project.id}`} className={styles.name}>
+        {project.name}
+      </Link>
+      <div className={styles.apiKey}>
+        <p>Api key: ***************</p>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(project.apiKey);
+            showInfo("API key successfully copied to clipboard!", { autoClose: true });
+          }}
+          className={styles.copyKey}
+        >
+          Copy API key
+        </button>
+      </div>
+      <p className={styles.createdBy}>Created by: You</p>
     </div>
   );
 }

@@ -9,6 +9,7 @@
   row-gap: 30px;
   column-gap: 30px;
   min-height: 100vh;
+  padding-bottom: 120px;
 }
 
 .container > nav {

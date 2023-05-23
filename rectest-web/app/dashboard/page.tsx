@@ -19,10 +19,14 @@ export default async function Dashboard() {
     <div>
       <div className={clsx("container", styles.list)}>
         <h1>My projects</h1>
-        <Link href="/dashboard/project/new">Create new project</Link>
-        {projects.map((p) => (
-          <ProjectItem project={p} />
-        ))}
+        <Link href="/dashboard/project/new" className={styles.newProject}>
+          + Create new project
+        </Link>
+        <div className={styles.projects}>
+          {projects.map((p) => (
+            <ProjectItem project={p} />
+          ))}
+        </div>
       </div>
     </div>
   );
