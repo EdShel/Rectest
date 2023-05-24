@@ -59,10 +59,9 @@ export default function useForm<T extends FormValues>({ initialValues, validatio
 
       try {
         await onSubmit(values);
-      } catch (e) {
+      } finally {
         isSubmittingRef.current = false;
         setSubmitting(false);
-        throw e;
       }
     },
     isSubmitting,

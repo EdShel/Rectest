@@ -12,8 +12,7 @@ export default function SignOutButton() {
     <button
       className={styles.signOutButton}
       onClick={async () => {
-        await signOut();
-        router.refresh();
+        await signOut({ callbackUrl: '/', redirect: true });
       }}
     >
       Sign out

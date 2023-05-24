@@ -1,0 +1,25 @@
+.container {
+  background-color: #fafafa;
+  min-height: 100vh;
+}
+
+.header {
+  box-shadow: 0 4px 4px #eeeeee;
+}
+
+.content {
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 86px;
+  background-color: #ffffff;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 4px #eeeeee;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #eeeeee;
+}

@@ -35,7 +35,7 @@ export default async function Header() {
               <Link href="/auth/sign-in" className={styles.linkButton}>
                 Sign in
               </Link>
-              <Link href="/auth/sign-up" className={styles.linkButton}>
+              <Link href="/auth/sign-up" className={clsx(styles.linkButton, styles.signUp)}>
                 Sign up
               </Link>
             </>

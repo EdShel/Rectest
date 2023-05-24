@@ -1,8 +1,9 @@
 .container {
-    width: 100%;
+  width: 100%;
+  background-color: #ffffff;
 }
 .container.scrolled {
-    box-shadow: 0 1px 12px var(--col-primary);
+  box-shadow: 0 1px 12px var(--col-primary);
 }
 
 .content {
@@ -17,9 +18,9 @@
 }
 
 .buttons {
-    display: flex;
-    align-items: center;
-    column-gap: 16px;
+  display: flex;
+  align-items: center;
+  column-gap: 16px;
 }
 
 .signOutButton {
@@ -54,6 +55,7 @@
   font-size: 1rem;
 }
 
+.signUp,
 .linkButton.primary,
 .linkButton:hover,
 .linkButton:focus {

@@ -5,6 +5,7 @@ import InputField from "@/app/ui/InputField";
 import isEmailValid from "@/utils/isEmailValid";
 import { signIn } from "next-auth/react";
 import useForm from "@/utils/useForm";
+import styles from "./page.module.css";
 
 export default function SignUp() {
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -15,7 +16,9 @@ export default function SignUp() {
       userName: "",
     },
     validation: {
+      userName: (userName) => (userName.length > 1 ? null : "Name is requred"),
       email: (email) => (isEmailValid(email) ? null : "Invalid email"),
+      password: (password) => (password.length >= 5 ? null : "Password must be at least 5 characters long"),
     },
     async onSubmit(values) {
       let res: Response;
@@ -42,8 +45,8 @@ export default function SignUp() {
 
   return (
     <main>
-      <h1>Sign up</h1>
-      <p>{submitError}</p>
+      <h1 className={styles.header}>Sign up</h1>
+      <p className={styles.error}>{submitError || Object.values(form.errors)[0]}</p>
       <InputField
         labelText="Name"
         name="userName"
@@ -53,6 +56,7 @@ export default function SignUp() {
         error={form.errors.userName}
         required
       />
+      <br />
       <InputField
         labelText="Email"
         name="email"
@@ -62,6 +66,7 @@ export default function SignUp() {
         error={form.errors.email}
         required
       />
+      <br />
       <InputField
         type="password"
         labelText="Password"
@@ -72,7 +77,11 @@ export default function SignUp() {
         error={form.errors.password}
         required
       />
-      <button onClick={form.handleSubmit} disabled={form.isSubmitting || Object.values(form.errors).length > 0}>
+      <button
+        className={styles.submitButton}
+        onClick={form.handleSubmit}
+        disabled={form.isSubmitting || Object.values(form.errors).length > 0}
+      >
         Register
       </button>
     </main>
