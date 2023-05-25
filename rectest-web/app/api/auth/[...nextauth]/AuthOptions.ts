@@ -10,6 +10,9 @@ const AuthOptions: IAuthOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
+  pages: {
+    signIn: "/auth/sign-in",
+  },
   callbacks: {
     session: async ({ session, token }) => {
       if (session?.user) {

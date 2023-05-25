@@ -1,29 +1,5 @@
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import { getCsrfToken } from "next-auth/react";
+import SignInForm from "./SignInForm";
 
 export default async function SignIn({}) {
-  const csrfToken = await getCsrfToken();
-  console.log('C1ll')
-  return (
-    <form method="post" action="/api/auth/callback/credentials">
-      <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
-      <label>
-        Username {csrfToken}
-        <input name="username" type="text" />
-      </label>
-      <label>
-        Password
-        <input name="password" type="password" />
-      </label>
-      <button type="submit">Sign in</button>
-    </form>
-  );
-}
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  return {
-    props: {
-      csrfToken: await getCsrfToken(context),
-    },
-  };
+  return <SignInForm />;
 }
