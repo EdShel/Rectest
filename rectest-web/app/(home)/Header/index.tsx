@@ -19,7 +19,9 @@ export default async function Header() {
   return (
     <div className={styles.container}>
       <div className={clsx("container", styles.content)}>
-        <Image src={rectestLogoPng} alt="Rectest" className={styles.logo} />
+        <Link href="/">
+          <Image src={rectestLogoPng} alt="Rectest" className={styles.logo} />
+        </Link>
         <div className={styles.buttons}>
           {isAuth && (
             <>

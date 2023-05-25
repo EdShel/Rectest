@@ -1,0 +1,26 @@
+.container {
+
+}
+
+.rename {
+    font-size: 0.75rem;
+    color: #666666;
+    margin-top: 8px;
+}
+
+.tests {
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+  margin-top: 30px;
+}
+
+.testRun {
+  display: block;
+  background-color: #ffffff;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #dddddd;
+  box-shadow: 0 4px 4px #eeeeee;
+}

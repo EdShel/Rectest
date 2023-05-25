@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.input {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--col-text);
+  display: inline-block;
+  border: none;
+  background-color: transparent;
+  padding-left: 32px;
+}
+
+.icon {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  left: 0px;
+  transform: translateY(3px);
+  transition: transform 0.3s ease;
+  pointer-events: none;
+}
+
+.container:has(.input:focus) .icon {
+  transform: rotate(-128deg);
+}

@@ -40,6 +40,12 @@ const ProjectRepository = {
       where: { id },
     });
   },
+  updateName: async (id: string, newName: string) => {
+    await db.gameProject.update({
+      data: { name: newName },
+      where: { id },
+    });
+  },
 };
 export default ProjectRepository;
 
