@@ -6,7 +6,7 @@ import failedIcon from "@/public/failed-icon.svg";
 import successIcon from "@/public/success-icon.svg";
 import Link from "next/link";
 import ProjectName from "./components/ProjectName";
-import styles from './page.module.css';
+import styles from "./page.module.css";
 import clsx from "clsx";
 
 interface PathParams {
@@ -30,11 +30,23 @@ export default async function Project({ params }: { params: PathParams }) {
       <div className={styles.tests}>
         {tests.map((test) => (
           <Link href={`/dashboard/project/${params.id}/${test.id}`} className={styles.testRun}>
-            <Image src={test.failed ? failedIcon : successIcon} alt={test.failed ? "Failed" : "Success"} />
-            <p>{test.insertDate.toLocaleString()}</p>
-            <p>Total: {test.total}</p>
-            <p>Success: {test.success}</p>
-            <p>Failed: {test.failed}</p>
+            <Image
+              src={test.failed ? failedIcon : successIcon}
+              alt={test.failed ? "Failed" : "Success"}
+              className={styles.icon}
+            />
+            <div className={styles.texts}>
+              <p>{test.insertDate.toLocaleString()}</p>
+              <p className={styles.total}>
+                TOTAL <span className={styles.value}>{test.total}</span>
+              </p>
+              <p className={styles.success}>
+                SUCCESS <span className={styles.value}>{test.success}</span>
+              </p>
+              <p className={styles.failed}>
+                FAILED <span className={styles.value}>{test.failed}</span>
+              </p>
+            </div>
           </Link>
         ))}
       </div>

@@ -16,11 +16,53 @@
 }
 
 .testRun {
-  display: block;
   background-color: #ffffff;
   border-radius: 4px;
   border-width: 1px;
   border-style: solid;
   border-color: #dddddd;
   box-shadow: 0 4px 4px #eeeeee;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  display: flex;
+  column-gap: 16px;
+  align-items: center;
+  text-decoration: none;
+  color: var(--col-text);
+}
+
+.icon {
+  width: 64px;
+  height: 64px;
+}
+
+.texts {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-grow: 1;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.total {
+  color: #666666;
+}
+
+.success {
+  color: #1fc457;
+}
+
+.failed {
+  color: #db5252;
+}
+
+.value {
+  font-size: 2.5rem;
+}
+
+.progress {
+
 }
