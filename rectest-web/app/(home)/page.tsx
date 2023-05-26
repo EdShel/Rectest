@@ -1,8 +1,7 @@
 import clsx from "clsx";
-import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.css";
-import rectestLogoImage from "@/public/rectest-logo.png";
+import CodeSection from "./CodeSection";
 import Header from "./Header";
 
 export default function Home() {
@@ -32,6 +31,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <CodeSection />
     </main>
   );
 }

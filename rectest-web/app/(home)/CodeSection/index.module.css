@@ -1,0 +1,44 @@
+.container {
+    margin-top: 5rem;
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    column-gap: 64px;
+}
+
+.textInfo {
+    padding-left: 128px;
+}
+
+.subtext {
+    margin-top: 16px;
+    font-size: 1rem;
+} 
+
+.container code {
+    white-space: pre-wrap;
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #282c34;
+    display: block;
+    border-radius: 8px;
+    color: #abb2bf;
+    padding-left: 32px;
+    padding-right: 32px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.keyword {
+    color: #c678dd;
+}
+
+.class {
+    color: #56b6c2;
+}
+
+.memberVar {
+    color: #e06c75;
+}
+
+.comment {
+    color: #5c6370;
+}
