@@ -6,7 +6,10 @@ export default function CodeSection() {
     <section className={clsx("container", styles.container)}>
       <div className={styles.textInfo}>
         <h2>Almost no code!</h2>
-        <p className={styles.subtext}>Easily integrate with your new and existing Unity 3D projects! Use Rectest package from Unity Asset Store and track player's input.</p>
+        <p className={styles.subtext}>
+          Easily integrate with your new and existing Unity 3D projects! Use Rectest package from Unity Asset Store and
+          track player's input.
+        </p>
       </div>
       <code>
         <span className={styles.keyword}>void </span>Start() {"{"}
@@ -25,6 +28,9 @@ export default function CodeSection() {
         <br />
         {"    "}
         <span className={styles.comment}>// Handle presses as usual</span>
+        <br />
+        {"    "}
+        <span className={styles.class}>RInput</span>.TriggerEvent(<span className={styles.memberVar}>"victory"</span>);{" "}
         <br />
         {"  }"}
         <br />
