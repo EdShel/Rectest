@@ -6,6 +6,7 @@ export interface TestRunCreateEntity {
   success: number;
   failed: number;
   testsResults: TestResultCreateEntity[];
+  performaceJson: string;
 }
 
 export interface TestResultCreateEntity {

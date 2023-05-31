@@ -97,6 +97,7 @@ foreach (string test in testsFiles)
         Console.Beep();
 
         netWriter.WriteLine("GO");
+        string perf = System.Text.Json.JsonSerializer.Serialize(ProcessPerfMonitor.GetPerformace(gameProcess));
 
         string? done = netReader.ReadLine();
         if (done != "DONE")
@@ -113,7 +114,8 @@ foreach (string test in testsFiles)
                 TestFile: Path.GetFileNameWithoutExtension(test),
                 IsSuccess: false,
                 ErrorMessage: testResult,
-                RecordingFileBase64: Convert.ToBase64String(File.ReadAllBytes(recordingFile))
+                RecordingFileBase64: Convert.ToBase64String(File.ReadAllBytes(recordingFile)),
+                PerformanceJson: perf
             ));
             File.Delete(recordingFile);
             Console.WriteLine(testResult);
@@ -124,10 +126,12 @@ foreach (string test in testsFiles)
                 TestFile: Path.GetFileNameWithoutExtension(test),
                 IsSuccess: true,
                 ErrorMessage: null,
-                RecordingFileBase64: Convert.ToBase64String(File.ReadAllBytes(recordingFile))
+                RecordingFileBase64: Convert.ToBase64String(File.ReadAllBytes(recordingFile)),
+                PerformanceJson: perf
             ));
             File.Delete(recordingFile);
         }
+
 
         gameProcess.Kill();
     }
@@ -137,7 +141,8 @@ foreach (string test in testsFiles)
             TestFile: Path.GetFileNameWithoutExtension(test),
             IsSuccess: false,
             ErrorMessage: "Unhandled exception during test execution",
-            RecordingFileBase64: string.Empty
+            RecordingFileBase64: string.Empty,
+            PerformanceJson: null
         ));
         Console.Error.WriteLine("Unhandled exception during test execution.");
         Console.Error.WriteLine(ex.Message);

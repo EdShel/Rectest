@@ -1,0 +1,19 @@
+.metric {
+    
+}
+
+.total {
+  color: #666666;
+}
+
+.success {
+  color: #1fc457;
+}
+
+.failed {
+  color: #db5252;
+}
+
+.value {
+  font-size: 2.5rem;
+}

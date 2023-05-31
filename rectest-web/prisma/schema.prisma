@@ -66,7 +66,7 @@ model GameProject {
   apiKey             String              @unique
   insertDate         DateTime            @default(now())
   gameProjectMembers GameProjectMember[]
-  testsRuns            TestRun[]
+  testsRuns          TestRun[]
 }
 
 model GameProjectMember {
@@ -96,6 +96,7 @@ model TestResult {
   testFile            String
   isSuccess           Boolean
   errorMessage        String?
-  recordingFileBase64 String @db.VarChar(MAX)
+  recordingFileBase64 String  @db.VarChar(MAX)
+  performanceJson     String? @db.VarChar(MAX)
   testRun             TestRun @relation(fields: [testRunId], references: [id], onDelete: Cascade)
 }

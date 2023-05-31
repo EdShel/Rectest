@@ -42,6 +42,7 @@ namespace Rectest.TestRunner
         string TestFile,
         bool IsSuccess,
         string? ErrorMessage,
-        string RecordingFileBase64
+        string RecordingFileBase64,
+        string? PerformanceJson
     );
 }
