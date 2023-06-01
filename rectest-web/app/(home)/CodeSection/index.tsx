@@ -23,7 +23,7 @@ export default function CodeSection() {
         <span className={styles.keyword}>void </span>Update() {"{"}
         <br />
         {"  "}
-        if (<span className={styles.class}>RInput</span>.GetKeyDown(<span className={styles.class}>KeyCode</span>.W){" "}
+        if (<span className={styles.class}>RInput</span>.GetKeyDown(<span className={styles.class}>KeyCode</span>.W)){" "}
         {"{"}
         <br />
         {"    "}

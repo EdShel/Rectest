@@ -1,3 +1,15 @@
+.title {
+  display: flex;
+}
+
+.date {
+  align-self: flex-end;
+  transform: translateY(-5px);
+  margin-left: 10px;
+  color: #666666;
+  font-weight: bold;
+}
+
 .metric {
     
 }

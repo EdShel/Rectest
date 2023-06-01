@@ -132,7 +132,6 @@ foreach (string test in testsFiles)
             File.Delete(recordingFile);
         }
 
-
         gameProcess.Kill();
     }
     catch (Exception ex)

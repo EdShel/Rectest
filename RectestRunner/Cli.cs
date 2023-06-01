@@ -8,7 +8,7 @@ public class Cli
     [Option('r', "record", Required = false, HelpText = "Recording mode")]
     public bool Record { get; set; }
 
-    [Option('n', "name", Required = false, HelpText = "New test mode")]
+    [Option('n', "name", Required = false, HelpText = "New test name")]
     public string? TestName { get; set; }
 
     [Option('t', "tests", Required = true, HelpText = "Folder with tests to run")]

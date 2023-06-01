@@ -16,7 +16,10 @@ export default async function TestRun({ params }: { params: PathParams }) {
 
   return (
     <div className="container">
-      <h1>Test result</h1>
+      <div className={styles.title}>
+        <h1>Test result</h1>
+        <p className={styles.date}>{testRun.insertDate.toLocaleString()}</p>
+      </div>
       <p className={styles.total}>
         TOTAL <span className={styles.value}>{testRun.total}</span>
       </p>

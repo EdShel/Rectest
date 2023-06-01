@@ -47,11 +47,23 @@ export default function TestResult({ isSuccess, errorMessage, testFile, videoBas
           </div>
           <div className={styles.value}>
             <span>RAM usage:</span>
-            <span>{performance?.Ram ?? "N/A"}</span>
+            <span>{performance?.Ram ? formatBytes(performance.Ram) : "N/A"}</span>
           </div>
         </div>
       </div>
       <video src={`data:video/mp4;base64,${videoBase64}`} controls className={styles.video} />
     </div>
   );
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) {
+    return `${bytes}b`;
+  }
+  const kb = bytes / 1024;
+  if (kb < 1024) {
+    return `${kb.toFixed(1)}kb`;
+  }
+  const mb = kb / 1024;
+  return `${mb.toFixed(1)}mb`;
 }
